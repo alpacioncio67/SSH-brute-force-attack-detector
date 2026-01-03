@@ -52,6 +52,7 @@ The system logs the authentication attempts in:
 ▶️ How to Run the Project
 
 1️⃣ Install dependencies
+
 pip install -r requirements.txt
 
 2️⃣ Place your log file
