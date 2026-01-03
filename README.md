@@ -59,9 +59,12 @@ pip install -r requirements.txt
 
 Copy your SSH authentication log into:
 data/auth.log
+
 You can use:
 Logs generated via Kali Linux
+
 Logs from another Linux system
+
 Sample logs for testing
 
 3️⃣ Run the analyzer
