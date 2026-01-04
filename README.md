@@ -34,18 +34,17 @@ ssh-log-analyzer/
 │
 ├── analyzer.py              # Script principal
 ├── data/
-│   └── auth.log             # Logs de ejemplo (o logs reales)
+│   └── auth.log             # Logs de ejemplo
 ├── results/
 │   └── sospechosos.csv      # Resultados del análisis
 ├── README.md
-└── requirements.txt
 ```
 
 ---
 
 ## ⚙️ Requisitos
 
-* Python 3.8+
+* Python 3
 * Librerías:
 
   * pandas
@@ -72,7 +71,7 @@ python analyzer.py --logfile data/auth.log
 | ----------- | --------------------------------------------------- |
 | `--logfile` | Ruta al archivo `auth.log` a analizar (obligatorio) |
 
-Ejemplo con logs reales (Kali Linux):
+Ejemplo con logs reales:
 
 ```bash
 python analyzer.py --logfile /var/log/auth.log
@@ -177,6 +176,8 @@ Usando logs de ejemplo incluidos en `data/auth.log`.
 
 Usando logs reales del sistema:
 
+Podemos generar los logs correspondientes para comprobar el funcionamiento usando alguna herramienta de fuerza bruta como hydra contra nosotros mismos.
+
 ```
 /var/log/auth.log
 ```
@@ -202,9 +203,7 @@ Esto permite:
 * Ventana temporal configurable por CLI
 * Umbrales de severidad configurables
 * Detección por IP + usuario
-* Exportar resumen a archivo `.txt` o `.md`
 * Visualizaciones
-* Tests automáticos
 
 ---
 
@@ -216,9 +215,3 @@ Este proyecto está diseñado como **proyecto de aprendizaje** para:
 * Análisis de logs
 * Análisis de datos con Python
 * Buenas prácticas para proyectos en GitHub
-
----
-
-## 👤 Autor
-
-Proyecto desarrollado con fines educativos y de portfolio.
