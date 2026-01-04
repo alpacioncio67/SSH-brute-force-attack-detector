@@ -1,76 +1,224 @@
-# SSH Brute Force Detection using Log Analysis (Kali Linux Version)
+# 🔐 SSH Brute Force Log Analyzer (v2)
 
-## 📌 Overview
-This project detects SSH brute force attacks by analyzing authentication logs generated during real attack simulations performed with Kali Linux tools.
+Proyecto educativo orientado a **ciberseguridad defensiva** y **análisis de datos**, cuyo objetivo es analizar logs de autenticación SSH (`auth.log`) para detectar **posibles ataques de fuerza bruta** mediante ventanas temporales, clasificación de severidad y un resumen tipo SOC.
 
-The goal is to simulate a realistic Blue Team scenario where an analyst receives system logs and must identify suspicious activity using Python-based data analysis.
+Este proyecto está pensado para demostrar:
 
-This is the **Version 2** of the project, improving upon a previous version that used simulated logs.
-
----
-
-## 🎯 Objectives
-- Generate real SSH authentication logs using Kali Linux
-- Detect brute force attacks based on failed login attempts
-- Allow analysis of both real and external log files
-- Validate detection logic through controlled attack testing
+* Pensamiento de **analista de seguridad (SOC)**
+* Uso de **Python para análisis de logs**
+* Buenas prácticas de scripting (CLI, estructura, outputs)
 
 ---
 
-## 🛠️ Technologies Used
-- Python 3
-- Kali Linux
-- OpenSSH
-- Hydra (attack simulation)
-- pandas / collections.Counter
-- Regular Expressions (regex)
+## 🧠 ¿Qué hace el proyecto?
+
+El programa analiza logs SSH y:
+
+* Extrae **timestamp, IP atacante y usuario objetivo**
+* Detecta **intentos fallidos de autenticación**
+* Agrupa eventos por **ventanas de tiempo (5 minutos)**
+* Clasifica los eventos por **severidad (LOW / MEDIUM / HIGH)**
+* Identifica:
+
+  * IPs sospechosas
+  * Usuarios más atacados
+* Genera un **resumen tipo SOC** en consola
+* Exporta resultados a CSV
 
 ---
 
-## 🧪 Attack Simulation (Kali Linux)
+## 🗂️ Estructura del proyecto
 
-To generate realistic logs, SSH brute force attacks were simulated using Kali Linux.
-
-### Example attack command:
-```bash
-hydra -l root -P rockyou.txt ssh://<TARGET_IP>
+```
+ssh-log-analyzer/
+│
+├── analyzer.py              # Script principal
+├── data/
+│   └── auth.log             # Logs de ejemplo (o logs reales)
+├── results/
+│   └── sospechosos.csv      # Resultados del análisis
+├── README.md
+└── requirements.txt
 ```
 
-The system logs the authentication attempts in:
+---
+
+## ⚙️ Requisitos
+
+* Python 3.8+
+* Librerías:
+
+  * pandas
+
+Instalación:
+
+```bash
+pip install pandas
+```
+
+---
+
+## ▶️ Uso (CLI)
+
+El programa se ejecuta desde la línea de comandos usando `argparse`:
+
+```bash
+python analyzer.py --logfile data/auth.log
+```
+
+### Argumentos
+
+| Argumento   | Descripción                                         |
+| ----------- | --------------------------------------------------- |
+| `--logfile` | Ruta al archivo `auth.log` a analizar (obligatorio) |
+
+Ejemplo con logs reales (Kali Linux):
+
+```bash
+python analyzer.py --logfile /var/log/auth.log
+```
+
+---
+
+## 📊 Análisis realizado
+
+### 1️⃣ Detección de intentos fallidos
+
+Se filtran las líneas que contienen:
+
+```
+Failed password
+```
+
+---
+
+### 2️⃣ Extracción de campos clave
+
+De cada evento se extraen:
+
+* Timestamp
+* IP de origen
+* Usuario objetivo
+
+---
+
+### 3️⃣ Ventana temporal
+
+Los eventos se agrupan por IP en una **ventana móvil de 5 minutos**, permitiendo distinguir entre:
+
+* Actividad normal
+* Ataques de fuerza bruta
+
+---
+
+### 4️⃣ Clasificación de severidad
+
+| Intentos en 5 min | Severidad |
+| ----------------- | --------- |
+| < 10              | LOW       |
+| 10 – 19           | MEDIUM    |
+| ≥ 20              | HIGH      |
+
+---
+
+### 5️⃣ Resumen tipo SOC
+
+El programa genera un resumen en consola con:
+
+* Total de intentos fallidos
+* Número de IPs atacantes únicas
+* Número de alertas de alta severidad
+* Usuario más atacado
+
+Ejemplo:
+
+```
+=== Analysis Summary ===
+Total failed attempts: 87
+Unique attacking IPs: 5
+High severity alerts: 2
+Most targeted user: root (45 attempts)
+```
+
+---
+
+## 📁 Output
+
+Se genera un archivo CSV con las IPs sospechosas:
+
+```
+results/sospechosos.csv
+```
+
+Incluye:
+
+* IP
+* Timestamp
+* Número de intentos
+* Severidad
+
+Este archivo puede ser usado para:
+
+* Bloqueo de IPs
+* Reglas de firewall
+* Análisis posterior
+
+---
+
+## 🐉 Kali Linux vs Logs de ejemplo
+
+Este proyecto puede ejecutarse:
+
+### ✅ En Windows
+
+Usando logs de ejemplo incluidos en `data/auth.log`.
+
+### ✅ En Kali Linux / Linux real
+
+Usando logs reales del sistema:
+
+```
 /var/log/auth.log
-⚠️ All attacks were performed in a controlled lab environment for educational purposes only.
+```
 
-⚙️ How the Analyzer Works
+Esto permite:
 
-1. Reads SSH authentication logs
-2. Filters failed login attempts
-3. Extracts source IP addresses using regex
-4. Counts failed attempts per IP
-5. Flags IPs exceeding a defined limit
-6. Outputs results to a CSV file
+* Validar el funcionamiento en un entorno real
+* Simular el flujo de trabajo de un SOC
 
-▶️ How to Run the Project
+---
 
-1️⃣ Install dependencies
+## 🧩 Tecnologías utilizadas
 
-pip install -r requirements.txt
+* Python
+* pandas
+* argparse
+* regex
 
-2️⃣ Place your log file
+---
 
-Copy your SSH authentication log into:
-data/auth.log
+## 🚀 Posibles mejoras futuras
 
-You can use:
-Logs generated via Kali Linux
+* Ventana temporal configurable por CLI
+* Umbrales de severidad configurables
+* Detección por IP + usuario
+* Exportar resumen a archivo `.txt` o `.md`
+* Visualizaciones
+* Tests automáticos
 
-Logs from another Linux system
+---
 
-Sample logs for testing
+## 🎓 Objetivo educativo
 
-3️⃣ Run the analyzer
+Este proyecto está diseñado como **proyecto de aprendizaje** para:
 
-python src/analyzer.py
-4️⃣ View results
+* Ciberseguridad defensiva
+* Análisis de logs
+* Análisis de datos con Python
+* Buenas prácticas para proyectos en GitHub
 
-Suspicious IPs will be saved in:
-results/suspicious_ips.csv
+---
+
+## 👤 Autor
+
+Proyecto desarrollado con fines educativos y de portfolio.
