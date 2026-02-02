@@ -1,217 +1,94 @@
-# 🔐 SSH Brute Force Log Analyzer (v2)
+SSH Brute Force Log Analyzer
+Pequeño script en Python que analiza logs de autenticación SSH (auth.log) para detectar posibles ataques de fuerza bruta usando ventanas temporales, niveles de severidad y un resumen tipo SOC.
 
-Proyecto educativo orientado a **ciberseguridad defensiva** y **análisis de datos**, cuyo objetivo es analizar logs de autenticación SSH (`auth.log`) para detectar **posibles ataques de fuerza bruta** mediante ventanas temporales, clasificación de severidad y un resumen tipo SOC.
+¿Qué hace la herramienta?
+El analizador:
 
-Este proyecto está pensado para demostrar:
+Busca intentos fallidos de autenticación SSH (Failed password) en los logs.
 
-* Pensamiento de **analista de seguridad (SOC)**
-* Uso de **Python para análisis de logs**
-* Buenas prácticas de scripting (CLI, estructura, outputs)
+Extrae de cada línea: timestamp, IP atacante y usuario objetivo.
 
----
+Agrupa los eventos por IP en una ventana de 5 minutos para detectar patrones de fuerza bruta.
 
-## 🧠 ¿Qué hace el proyecto?
+Asigna una severidad según el número de intentos en esa ventana: LOW, MEDIUM o HIGH.
 
-El programa analiza logs SSH y:
+Genera un resumen en consola (IPs atacantes, usuario más atacado, total de intentos, etc.).
 
-* Extrae **timestamp, IP atacante y usuario objetivo**
-* Detecta **intentos fallidos de autenticación**
-* Agrupa eventos por **ventanas de tiempo (5 minutos)**
-* Clasifica los eventos por **severidad (LOW / MEDIUM / HIGH)**
-* Identifica:
+Exporta un CSV con las IPs sospechosas para uso posterior (reglas de firewall, bloqueos, análisis, etc.).
 
-  * IPs sospechosas
-  * Usuarios más atacados
-* Genera un **resumen tipo SOC** en consola
-* Exporta resultados a CSV
+Requisitos
+Python 3 y la librería pandas.
 
----
+Instalación rápida de dependencias:
 
-## 🗂️ Estructura del proyecto
+bash
+# Opción 1:
+python3 -m pip install --user pandas
 
-```
-ssh-log-analyzer/
-│
-├── analyzer.py              # Script principal
-├── data/
-│   └── auth.log             # Logs de ejemplo
-├── results/
-│   └── sospechosos.csv      # Resultados del análisis
-├── README.md
-```
+# Opción 2: paquetes del sistema (Debian/Ubuntu)
+sudo apt update
+sudo apt install python3-pandas
 
----
+Cómo usar la herramienta
+1. Clonar el repositorio
+bash
+git clone https://github.com/alpacioncio67/SSH-brute-force-attack-detector.git
+cd SSH-brute-force-attack-detector
+2. Ejecutar con el log de ejemplo
+Desde la carpeta del proyecto:
 
-## ⚙️ Requisitos
+bash
+python3 analyzer.py data/auth.log
+Esto analizará el archivo data/auth.log incluido en el repo y generará la salida correspondiente.
 
-* Python 3
-* Librerías:
+3. Analizar logs reales de tu sistema
+En muchas distribuciones Linux, el log de autenticación está en:
 
-  * pandas
+bash
+/var/log/auth.log
+Ejemplo de uso con un log real:
 
-Instalación:
+bash
+sudo python3 analyzer.py /var/log/auth.log
+Usa sudo solo si tu usuario no puede leer el log directamente.
 
-```bash
-pip install pandas
-```
+📊 Qué información obtendrás
+Al terminar la ejecución, verás algo similar en la consola:
 
----
-
-## ▶️ Uso (CLI)
-
-El programa se ejecuta desde la línea de comandos usando `argparse`:
-
-```bash
-python analyzer.py --logfile data/auth.log
-```
-
-### Argumentos
-
-| Argumento   | Descripción                                         |
-| ----------- | --------------------------------------------------- |
-| `--logfile` | Ruta al archivo `auth.log` a analizar (obligatorio) |
-
-Ejemplo con logs reales:
-
-```bash
-python analyzer.py --logfile /var/log/auth.log
-```
-
----
-
-## 📊 Análisis realizado
-
-### 1️⃣ Detección de intentos fallidos
-
-Se filtran las líneas que contienen:
-
-```
-Failed password
-```
-
----
-
-### 2️⃣ Extracción de campos clave
-
-De cada evento se extraen:
-
-* Timestamp
-* IP de origen
-* Usuario objetivo
-
----
-
-### 3️⃣ Ventana temporal
-
-Los eventos se agrupan por IP en una **ventana móvil de 5 minutos**, permitiendo distinguir entre:
-
-* Actividad normal
-* Ataques de fuerza bruta
-
----
-
-### 4️⃣ Clasificación de severidad
-
-| Intentos en 5 min | Severidad |
-| ----------------- | --------- |
-| < 10              | LOW       |
-| 10 – 19           | MEDIUM    |
-| ≥ 20              | HIGH      |
-
----
-
-### 5️⃣ Resumen tipo SOC
-
-El programa genera un resumen en consola con:
-
-* Total de intentos fallidos
-* Número de IPs atacantes únicas
-* Número de alertas de alta severidad
-* Usuario más atacado
-
-Ejemplo:
-
-```
+text
 === Analysis Summary ===
 Total failed attempts: 87
 Unique attacking IPs: 5
 High severity alerts: 2
 Most targeted user: root (45 attempts)
-```
+Y en results/sospechosos.csv encontrarás columnas como:
 
----
+IP
 
-## 📁 Output
+Timestamp (ventana donde se detectó el ataque)
 
-Se genera un archivo CSV con las IPs sospechosas:
+attempts (número de intentos en la ventana)
 
-```
-results/sospechosos.csv
-```
+severity (LOW / MEDIUM / HIGH)
 
-Incluye:
+Este CSV se puede usar para:
 
-* IP
-* Timestamp
-* Número de intentos
-* Severidad
+Automatizar bloqueos de IPs.
 
-Este archivo puede ser usado para:
+Crear reglas de firewall.
 
-* Bloqueo de IPs
-* Reglas de firewall
-* Análisis posterior
+🧪 Ideas para probarlo
+Generar tus propios intentos fallidos con una herramienta de fuerza bruta (por ejemplo, hydra) contra una máquina de pruebas para ver cómo los detecta el script.
 
----
+Ajustar el tamaño de la ventana de tiempo o los umbrales de severidad dentro de analyzer.py para experimentar con distintos criterios de alerta.
 
-## 🐉 Kali Linux vs Logs de ejemplo
+🎓 Objetivo educativo
+Este proyecto está pensado como ejercicio práctico de:
 
-Este proyecto puede ejecutarse:
+Ciberseguridad defensiva.
 
-### ✅ En Windows
+Análisis de logs.
 
-Usando logs de ejemplo incluidos en `data/auth.log`.
+Análisis de datos con Python.
 
-### ✅ En Kali Linux / Linux real
-
-Usando logs reales del sistema:
-
-Podemos generar los logs correspondientes para comprobar el funcionamiento usando alguna herramienta de fuerza bruta como hydra contra nosotros mismos.
-
-```
-/var/log/auth.log
-```
-
-Esto permite:
-
-* Validar el funcionamiento en un entorno real
-* Simular el flujo de trabajo de un SOC
-
----
-
-## 🧩 Tecnologías utilizadas
-
-* Python
-* pandas
-* argparse
-* regex
-
----
-
-## 🚀 Posibles mejoras futuras
-
-* Ventana temporal configurable por CLI
-* Umbrales de severidad configurables
-* Detección por IP + usuario
-* Visualizaciones
-
----
-
-## 🎓 Objetivo educativo
-
-Este proyecto está diseñado como **proyecto de aprendizaje** para:
-
-* Ciberseguridad defensiva
-* Análisis de logs
-* Análisis de datos con Python
-* Buenas prácticas para proyectos en GitHub
+Buenas prácticas básicas en proyectos de línea de comandos y GitHub.
