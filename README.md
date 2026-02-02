@@ -1,7 +1,7 @@
-SSH Brute Force Log Analyzer
+ SSH Brute Force Log Analyzer
 Pequeño script en Python que analiza logs de autenticación SSH (auth.log) para detectar posibles ataques de fuerza bruta usando ventanas temporales, niveles de severidad y un resumen tipo SOC.
 
-¿Qué hace la herramienta?
+ ¿Qué hace la herramienta?
 El analizador:
 
 Busca intentos fallidos de autenticación SSH (Failed password) en los logs.
@@ -16,20 +16,20 @@ Genera un resumen en consola (IPs atacantes, usuario más atacado, total de inte
 
 Exporta un CSV con las IPs sospechosas para uso posterior (reglas de firewall, bloqueos, análisis, etc.).
 
-Requisitos
+ Requisitos
 Python 3 y la librería pandas.
 
-Instalación rápida de dependencias:
+ Instalación rápida de dependencias:
 
 bash
-# Opción 1:
+Opción 1:
 python3 -m pip install --user pandas
 
-# Opción 2: paquetes del sistema (Debian/Ubuntu)
+Opción 2: paquetes del sistema (Debian/Ubuntu)
 sudo apt update
 sudo apt install python3-pandas
 
-Cómo usar la herramienta
+ Cómo usar la herramienta
 1. Clonar el repositorio
 bash
 git clone https://github.com/alpacioncio67/SSH-brute-force-attack-detector.git
@@ -52,7 +52,7 @@ bash
 sudo python3 analyzer.py /var/log/auth.log
 Usa sudo solo si tu usuario no puede leer el log directamente.
 
-📊 Qué información obtendrás
+ Qué información obtendrás
 Al terminar la ejecución, verás algo similar en la consola:
 
 text
@@ -77,12 +77,12 @@ Automatizar bloqueos de IPs.
 
 Crear reglas de firewall.
 
-🧪 Ideas para probarlo
+ Ideas para probarlo
 Generar tus propios intentos fallidos con una herramienta de fuerza bruta (por ejemplo, hydra) contra una máquina de pruebas para ver cómo los detecta el script.
 
 Ajustar el tamaño de la ventana de tiempo o los umbrales de severidad dentro de analyzer.py para experimentar con distintos criterios de alerta.
 
-🎓 Objetivo educativo
+ Objetivo educativo
 Este proyecto está pensado como ejercicio práctico de:
 
 Ciberseguridad defensiva.
