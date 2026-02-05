@@ -38,7 +38,7 @@ cd SSH-brute-force-attack-detector
 Desde la carpeta del proyecto:
 
 bash
-python3 analyzer.py data/auth.log
+python3 src/analyzer.py --logfile data/auth.log
 Esto analizará el archivo data/auth.log incluido en el repo y generará la salida correspondiente.
 
 3. Analizar logs reales de tu sistema
