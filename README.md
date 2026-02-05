@@ -45,10 +45,12 @@ Esto analizará el archivo data/auth.log incluido en el repo y generará la sali
 En muchas distribuciones Linux, el log de autenticación está en:
 
 bash
+
 /var/log/auth.log
 Ejemplo de uso con un log real:
 
 bash
+
 sudo python3 analyzer.py /var/log/auth.log
 Usa sudo solo si tu usuario no puede leer el log directamente.
 
@@ -56,6 +58,7 @@ Usa sudo solo si tu usuario no puede leer el log directamente.
 Al terminar la ejecución, verás algo similar en la consola:
 
 text
+
 === Analysis Summary ===
 Total failed attempts: 87
 Unique attacking IPs: 5
